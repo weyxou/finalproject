@@ -15,9 +15,6 @@ public class NoteService {
 
     @Autowired
     private NoteRepository noteRepository;
-    @Autowired
-    private UserRepository userRepository;
-
 
     public List<Note> getAllNotes() {
         return noteRepository.findAll();
@@ -35,15 +32,6 @@ public class NoteService {
         if (noteRepository.existsById(id)) {
             updatedNotes.setId(id);
             return noteRepository.save(updatedNotes);
-        }
-        return null;
-    }
-    public Note createNoteWithUser(Long userId, Note note) {
-        Optional<User> optionalUser = userRepository.findById(userId);
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            note.setUser(user);
-            return noteRepository.save(note);
         }
         return null;
     }

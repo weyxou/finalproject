@@ -36,14 +36,17 @@ public class NoteController {
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @PostMapping
-    public ResponseEntity<Note> createNote(@RequestBody Note note, @RequestParam("user_id") Long user_id) {
-        Optional<User> userOptional = Optional.ofNullable(userService.getUserById(user_id));
-        if (!userOptional.isPresent()) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    @PostMapping("/{userId}")
+    public ResponseEntity<Note> createNote(@PathVariable("userId") Long userId, @RequestBody Note note) {
+        Optional<User> userOptional = Optional.ofNullable(userService.getUserById(userId));
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
         }
-        note.setUser(userOptional.get());
+        User user = userOptional.get();
+        note.setUser(user);
         note.setCreationDate(new Date());
+        note.setTitle(note.getTitle());
+        note.setDescription(note.getDescription());
 
         Note createdNote = noteService.createNotes(note);
         return new ResponseEntity<>(createdNote, HttpStatus.CREATED);
