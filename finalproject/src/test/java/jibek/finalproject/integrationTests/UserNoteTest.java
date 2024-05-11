@@ -54,7 +54,7 @@ public class UserNoteTest {
         noteRepository.save(note);
 
         // Получаем идентификатор пользователя
-        Long userId = user.getId();
+        String userId = String.valueOf(user.getId());
 
         // Отправляем запрос на получение заметок пользователя
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/notes/" + userId)
