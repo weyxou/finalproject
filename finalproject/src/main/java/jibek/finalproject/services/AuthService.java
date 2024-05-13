@@ -1,5 +1,7 @@
 package jibek.finalproject.services;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import jibek.finalproject.dtos.ReqRes;
 import jibek.finalproject.entities.User;
 import jibek.finalproject.repositories.UserRepository;
@@ -16,27 +18,25 @@ public class AuthService {
 
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private JwtUtils jwtUtils;
-
     @Autowired
-    PasswordEncoder passwordEncoder;
-
+    private PasswordEncoder passwordEncoder;
     @Autowired
-    AuthenticationManager authenticationManager;
+    private AuthenticationManager authenticationManager;
 
     public ReqRes signUp(ReqRes registrationRequest){
         ReqRes resp = new ReqRes();
         try {
-            User User = new User();
-            User.setEmail(registrationRequest.getEmail());
-            User.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
-//            User.setRole(registrationRequest.getRole()); // Use role field directly
-            User userResult = userRepository.save(User);
-            if (userResult != null && userResult.getId()>0) {
-                resp.setUser(userResult);
-                resp.setMessage("Successfully");
+            User ourUsers = new User();
+            ourUsers.setEmail(registrationRequest.getEmail());
+            ourUsers.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
+            ourUsers.setRole(registrationRequest.getRole());
+            ourUsers.setName(registrationRequest.getName());
+            User ourUserResult = userRepository.save(ourUsers);
+            if (ourUserResult != null && ourUserResult.getId()>0) {
+                resp.setUser(ourUserResult);
+                resp.setMessage("User Saved Successfully");
                 resp.setStatusCode(200);
             }
         }catch (Exception e){
@@ -53,7 +53,7 @@ public class AuthService {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signinRequest.getEmail(),signinRequest.getPassword()));
             var user = userRepository.findByEmail(signinRequest.getEmail()).orElseThrow();
             System.out.println("USER IS: "+ user);
-            var jwt = jwtUtils.generatedToken(user);
+            var jwt = jwtUtils.generateToken(user);
             var refreshToken = jwtUtils.generateRefreshToken(new HashMap<>(), user);
             response.setStatusCode(200);
             response.setToken(jwt);
@@ -70,9 +70,9 @@ public class AuthService {
     public ReqRes refreshToken(ReqRes refreshTokenReqiest){
         ReqRes response = new ReqRes();
         String ourEmail = jwtUtils.extractUsername(refreshTokenReqiest.getToken());
-        User user = userRepository.findByEmail(ourEmail).orElseThrow();
-        if (jwtUtils.isTokenValid(refreshTokenReqiest.getToken(), user)) {
-            var jwt = jwtUtils.generatedToken(user);
+        User users = userRepository.findByEmail(ourEmail).orElseThrow();
+        if (jwtUtils.isTokenValid(refreshTokenReqiest.getToken(), users)) {
+            var jwt = jwtUtils.generateToken(users);
             response.setStatusCode(200);
             response.setToken(jwt);
             response.setRefreshToken(refreshTokenReqiest.getToken());

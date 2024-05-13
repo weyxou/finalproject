@@ -5,16 +5,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import jibek.finalproject.entities.Note;
 import jibek.finalproject.entities.User;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+
 
 import java.util.List;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Getter
-@Setter
 public class ReqRes {
 
     private int statusCode;
@@ -30,6 +27,15 @@ public class ReqRes {
     private String title;
     private User user;
     private List<Note> notes;
+    public String description;
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     public String getEmail() {
         return email;
@@ -134,4 +140,6 @@ public class ReqRes {
     public void setRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }
+
+
 }
